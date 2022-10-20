@@ -1,46 +1,65 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-const Login = () => {
-    let navigate = useNavigate();
-    let location = useLocation();
-    let from = location.state?.from?.pathname || "/";
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUpdateProfile } from 'react-firebase-hooks/auth';
 
+const Register = () => {
+    const navigate = useNavigate();
+    const [updateProfile, updating, updateError] = useUpdateProfile(auth);
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [
-        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
         user,
         loading,
         error,
-      ] = useSignInWithEmailAndPassword(auth);
-    useEffect(()=>{
-        if (user || gUser) {
-            console.log(user || gUser);
-            navigate(from, { replace: true });
-        }
-    })
-    if(loading || gLoading){
+      ] = useCreateUserWithEmailAndPassword(auth);
+
+    if (loading || gLoading || updating) {
         return <button className="btn btn-square loading"></button>
     }
     let userNotCreate;
-    if(error || gError){
-        userNotCreate = <p className='text-red-500'>{error?.message || gError?.message}</p>
+    if (error || gError || updateError) {
+        userNotCreate = <p className='text-red-500'>{error?.message || gError?.message || updateError.message}</p>
     }
-    
-    const onSubmit = (data) => {
+    if (user || gUser) {
+        console.log(user || gUser);
+    }
+    const onSubmit = async(data) => {
         console.log(data);
-        signInWithEmailAndPassword(data.email, data.password)
+        await createUserWithEmailAndPassword(data.email, data.password);
+        await updateProfile({ displayName:data.name });
+        alert('Updated profile');
+        navigate('/appoinment')
     };
     return (
         <div className='h-screen flex justify-center items-center'>
             <div className="card w-96 bg-base-100 shadow-xl">
                 <div className="card-body">
-                    <h2 className="text-2xl text-center">Login</h2>
+                    <h2 className="text-2xl text-center">Sign Up</h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text text-xl">Name</span>
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Your Name"
+                                className="input input-bordered w-full max-w-xs"
+                                {...register("name", {
+                                    required: {
+                                        value: true,
+                                        message: 'Please give a valid name'
+                                    }
+                                })}
+                            />
+                            <label className="label">
+                                {errors.name?.type === 'required' && <span className="label-text-alt">{errors.name.message}</span>}
+                            </label>
+                        </div>
                         <div className="form-control w-full max-w-xs">
                             <label className="label">
                                 <span className="label-text text-xl">Email</span>
@@ -81,7 +100,7 @@ const Login = () => {
                                     minLength: {
                                         value: 6,
                                         message: 'Give atleast 6 character' // JS only: <p>error message</p> TS only support string
-                                      }
+                                    }
                                 })}
                             />
                             <label className="label">
@@ -90,9 +109,9 @@ const Login = () => {
                             </label>
                         </div>
                         {userNotCreate}
-                        <input className="btn btn-accent w-full max-w-xs" type="submit" value="Login" />
+                        <input className="btn btn-accent w-full max-w-xs" type="submit" value="Sign Up" />
                     </form>
-                    <p className='text-center'><small>New to Doctors portal? <Link to='/register' className='text-primary'>Create a account</Link></small></p>
+                    <p className='text-center'><small>Already have an account? <Link to='/login' className='text-primary'>Login</Link></small></p>
                     <div className="divider">OR</div>
                     <div className="card-actions justify-center">
                         <button onClick={() => signInWithGoogle()} className="btn btn-outline btn-success">SignIn_Google</button>
@@ -103,4 +122,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;

@@ -7,7 +7,7 @@ const AvailableServices = ({ date }) => {
     const [treatment, setTreatment] = useState(null);
     useEffect(()=>
     {
-        fetch('services.json')
+        fetch('http://localhost:5000/service')
         .then(res => res.json())
         .then(data => setServices(data))
     },[]
@@ -18,7 +18,7 @@ const AvailableServices = ({ date }) => {
                 <h3 className='text-primary'>Available Services On {format(date, 'PP')}</h3>
                 <h3>Please Select a Service.</h3>
             </div>
-            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mt-2'>
                 {
                     services.map(service => <AvailableService key={service._id} service={service} setTreatment={setTreatment}></AvailableService>)
                 }
