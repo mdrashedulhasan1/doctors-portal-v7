@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const About = () => {
+    const [products, setProducts] = useState([]);
+    useEffect(()=>{
+        fetch('http://localhost:5000/service')
+        .then(res => res.json())
+        .then(data => setProducts(data))
+    },[])
     return (
         <div>
-            <h1>This is My About Page</h1>
+            {
+                products.map(service => <li>{service.name}</li>)
+            }
         </div>
     );
 };
