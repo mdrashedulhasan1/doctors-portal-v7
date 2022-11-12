@@ -6,7 +6,7 @@ import { signOut } from 'firebase/auth';
 const Navbar = () => {
     const logout = () => {
         signOut(auth);
-      };
+    };
     const [user, loading, error] = useAuthState(auth);
     const items = <>
         <li><Link className='text-xl' to='/'>Home</Link></li>
@@ -14,7 +14,8 @@ const Navbar = () => {
         <li><Link className='text-xl' to='/appoinment'>Appoinment</Link></li>
         <li><Link className='text-xl' to='/review'>Review</Link></li>
         <li><Link className='text-xl' to='/contact'>Contact Us</Link></li>
-        <li>{user? <button onClick={logout} className="btn text-xl btn-ghost">Sign Out</button>:<Link className='text-xl' to='/login'>Login</Link>}</li>
+        <li>{user && <Link className='text-xl' to='/dashboard'>Dashboard</Link>}</li>
+        <li>{user ? <button onClick={logout} className="btn text-xl btn-ghost">Sign Out</button> : <Link className='text-xl' to='/login'>Login</Link>}</li>
     </>
     return (
         <div className="navbar bg-base-100">
@@ -33,6 +34,9 @@ const Navbar = () => {
                 <ul className="menu menu-horizontal p-0">
                     {items}
                 </ul>
+            </div>
+            <div className='navbar-end'>
+            <label tabIndex={1} htmlFor="my-drawer-2" className="btn btn-primary drawer-button lg:hidden"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="5" d="M4 6h16M4 12h8m-8 6h16" /></svg></label>
             </div>
         </div>
     );
